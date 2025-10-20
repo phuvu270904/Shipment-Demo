@@ -19,7 +19,7 @@ import ormconfig from './ormconfig';
       envFilePath: [`.env.${process.env.NODE_ENV}`],
     }),
     TypeOrmModule.forRoot({
-      type: 'mysql',
+      type: 'postgres',
       host: process.env.DB_HOST,
       port: +process.env.DB_PORT,
       username: process.env.DB_USERNAME,
@@ -27,6 +27,9 @@ import ormconfig from './ormconfig';
       database: process.env.DB_DATABASE,
       entities: ['dist/api/**/*.entity.js'],
       synchronize: false,
+      ssl: {
+        rejectUnauthorized: false,
+      },
       logging: true,
       logger: 'file',
     }),
