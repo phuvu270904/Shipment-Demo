@@ -52,7 +52,12 @@ async function bootstrap() {
   if (process.env.NODE_ENV === 'production') {
     app.use(csurf());
   }
-  app.use(helmet());
+  app.use(
+    helmet({
+      contentSecurityPolicy: process.env.NODE_ENV === 'production' ? undefined : false,
+    }),
+  );
+
 
   // ** Swagger Setting
   if (process.env.NODE_ENV !== 'production') {
