@@ -65,15 +65,9 @@ input RegisterReqDto {
   nickname: String!
   idAddress: String!
   password: String!
-  role: UserRole
+  role: String
   phone: String
   dob: DateTime
-}
-
-"""User role in the system"""
-enum UserRole {
-  USER
-  ADMIN
 }
 
 input RefreshTokenReqDto {

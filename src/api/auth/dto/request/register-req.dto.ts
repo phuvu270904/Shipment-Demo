@@ -1,5 +1,4 @@
 import { Field, InputType } from '@nestjs/graphql';
-import { UserRole } from '../../../users/entities/user.entity';
 
 @InputType()
 export class RegisterReqDto {
@@ -12,8 +11,8 @@ export class RegisterReqDto {
   @Field()
   password: string;
 
-  @Field(() => UserRole, { nullable: true })
-  role?: UserRole;
+  @Field(() => String, { nullable: true })
+  role?: string;
 
   @Field({ nullable: true })
   phone?: string;

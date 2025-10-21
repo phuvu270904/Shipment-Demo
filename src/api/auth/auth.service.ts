@@ -44,7 +44,9 @@ export class AuthService {
       password: hashedPassword,
       phone: RegisterReqDto.phone,
       dob: RegisterReqDto.dob,
-      role: RegisterReqDto.role ? RegisterReqDto.role : UserRole.USER,
+      role: Object.values(UserRole).includes(RegisterReqDto.role as UserRole)
+        ? (RegisterReqDto.role as UserRole)
+        : UserRole.USER,
       registration_type: RegistrationType.GENERAL,
     });
 

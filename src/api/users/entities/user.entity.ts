@@ -39,37 +39,6 @@ export enum DeviceStatus {
   LOGGED_OUT = 'logged_out',
 }
 
-// Register enums with GraphQL
-registerEnumType(UserRole, {
-  name: 'UserRole',
-  description: 'User role in the system',
-});
-
-registerEnumType(RegistrationType, {
-  name: 'RegistrationType',
-  description: 'User registration type',
-});
-
-registerEnumType(MemberType, {
-  name: 'MemberType',
-  description: 'Member type',
-});
-
-registerEnumType(ModelType, {
-  name: 'ModelType',
-  description: 'Device model type',
-});
-
-registerEnumType(GradeType, {
-  name: 'GradeType',
-  description: 'User grade type',
-});
-
-registerEnumType(DeviceStatus, {
-  name: 'DeviceStatus',
-  description: 'Device status',
-});
-
 @Entity('users')
 export class UserEntity {
   @PrimaryGeneratedColumn()
