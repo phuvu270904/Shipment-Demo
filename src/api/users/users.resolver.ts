@@ -8,24 +8,21 @@ import { DeleteManyUsersReqDto } from './dto/request/delete-many-users-req.dto';
 import { DeleteManyResDto } from './dto/response/delete-many-res.dto';
 import { Role } from '../../decorators/roles.decorator';
 import { UserRole } from '../../common/enum/user.role';
+import { CustomMutation, CustomQuery } from '../../decorators/custom-graphql.decorator';
 
 @Resolver(() => UserResDto)
 @Role(UserRole.ADMIN)
 export class UsersResolver {
   constructor(private readonly usersService: UsersService) {}
 
-  @Mutation(() => UserResDto, {
-    description: 'Create a new user',
-  })
+  @CustomMutation(() => UserResDto, 'Create a new user')
   async createUser(
     @Args('input') createUserDto: CreateUserReqDto,
   ): Promise<UserResDto> {
     return this.usersService.create(createUserDto);
   }
 
-  @Query(() => UsersListResDto, {
-    description: 'Get all users with pagination',
-  })
+  @CustomQuery(() => UsersListResDto, 'Get all users with pagination')
   async users(
     @Args('page', { type: () => Int, defaultValue: 1 }) page: number,
     @Args('pageSize', { type: () => Int, defaultValue: 10 }) pageSize: number,
@@ -33,18 +30,14 @@ export class UsersResolver {
     return this.usersService.findAll(page, pageSize);
   }
 
-  @Query(() => UserResDto, {
-    description: 'Get a user by ID',
-  })
+  @CustomQuery(() => UserResDto, 'Get a user by ID')
   async user(
     @Args('id', { type: () => Int }) id: number,
   ): Promise<UserResDto> {
     return this.usersService.findOne(id);
   }
 
-  @Mutation(() => UserResDto, {
-    description: 'Update a user',
-  })
+  @CustomMutation(() => UserResDto, 'Update a user')
   async updateUser(
     @Args('id', { type: () => Int }) id: number,
     @Args('input') updateUserDto: UpdateUserReqDto,
@@ -52,9 +45,7 @@ export class UsersResolver {
     return this.usersService.update(id, updateUserDto);
   }
 
-  @Mutation(() => Boolean, {
-    description: 'Delete a user',
-  })
+  @CustomMutation(() => Boolean, 'Delete a user')
   async removeUser(
     @Args('id', { type: () => String }) id: string,
   ): Promise<boolean> {
@@ -62,9 +53,7 @@ export class UsersResolver {
     return true;
   }
 
-  @Mutation(() => DeleteManyResDto, {
-    description: 'Delete multiple users',
-  })
+  @CustomMutation(() => DeleteManyResDto, 'Delete multiple users')
   async removeUsers(
     @Args('input') deleteManyUsersDto: DeleteManyUsersReqDto,
   ): Promise<DeleteManyResDto> {

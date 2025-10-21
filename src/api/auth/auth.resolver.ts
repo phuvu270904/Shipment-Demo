@@ -11,23 +11,20 @@ import { LoginResDto } from './dto/response/login-res.dto';
 import { RegisterResDto } from './dto/response/register-res.dto';
 import { RefreshTokenResDto } from './dto/response/refresh-token-res.dto';
 import { UserProfileResDto } from './dto/response/user-profile-res.dto';
+import { CustomMutation, CustomQuery } from '../../decorators/custom-graphql.decorator';
 
 @Resolver()
 export class AuthResolver {
   constructor(private readonly authService: AuthService) {}
 
   @Public()
-  @Mutation(() => LoginResDto, {
-    description: 'Login with id and password',
-  })
+  @CustomMutation(() => LoginResDto, 'Login with id and password')
   async login(@Args('input') loginInput: LoginReqDto): Promise<LoginResDto> {
     return this.authService.login(loginInput);
   }
 
   @Public()
-  @Mutation(() => RegisterResDto, {
-    description: 'Register a new user',
-  })
+  @CustomMutation(() => RegisterResDto, 'Register a new user')
   async register(
     @Args('input') registerInput: RegisterReqDto,
   ): Promise<RegisterResDto> {
@@ -35,18 +32,14 @@ export class AuthResolver {
   }
 
   @Public()
-  @Mutation(() => RefreshTokenResDto, {
-    description: 'Refresh access token',
-  })
+  @CustomMutation(() => RefreshTokenResDto, 'Refresh access token')
   async refreshToken(
     @Args('input') refreshTokenInput: RefreshTokenReqDto,
   ): Promise<RefreshTokenResDto> {
     return this.authService.refreshToken(refreshTokenInput);
   }
 
-  @Query(() => UserProfileResDto, {
-    description: 'Get current user profile',
-  })
+  @CustomQuery(() => UserProfileResDto, 'Get current user profile')
   async profile(@Context() context): Promise<UserProfileResDto> {
     const userId = context.req.user.id;
     return this.authService.getProfile(userId);

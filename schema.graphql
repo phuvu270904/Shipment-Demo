@@ -69,36 +69,36 @@ type UserProfileResDto {
 
 type Query {
   """Get all users with pagination"""
-  users(page: Int! = 1, pageSize: Int! = 10): UsersListResDto!
+  Users_users(page: Int! = 1, pageSize: Int! = 10): UsersListResDto!
 
   """Get a user by ID"""
-  user(id: Int!): UserResDto!
+  Users_user(id: Int!): UserResDto!
 
   """Get current user profile"""
-  profile: UserProfileResDto!
+  Auth_profile: UserProfileResDto!
 }
 
 type Mutation {
   """Create a new user"""
-  createUser(input: CreateUserReqDto!): UserResDto!
+  Users_createUser(input: CreateUserReqDto!): UserResDto!
 
   """Update a user"""
-  updateUser(id: Int!, input: UpdateUserReqDto!): UserResDto!
+  Users_updateUser(id: Int!, input: UpdateUserReqDto!): UserResDto!
 
   """Delete a user"""
-  removeUser(id: String!): Boolean!
+  Users_removeUser(id: String!): Boolean!
 
   """Delete multiple users"""
-  removeUsers(input: DeleteManyUsersReqDto!): DeleteManyResDto!
+  Users_removeUsers(input: DeleteManyUsersReqDto!): DeleteManyResDto!
 
   """Login with id and password"""
-  login(input: LoginReqDto!): LoginResDto!
+  Auth_login(input: LoginReqDto!): LoginResDto!
 
   """Register a new user"""
-  register(input: RegisterReqDto!): RegisterResDto!
+  Auth_register(input: RegisterReqDto!): RegisterResDto!
 
   """Refresh access token"""
-  refreshToken(input: RefreshTokenReqDto!): RefreshTokenResDto!
+  Auth_refreshToken(input: RefreshTokenReqDto!): RefreshTokenResDto!
 }
 
 input CreateUserReqDto {
