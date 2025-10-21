@@ -1,9 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum, IsOptional } from 'class-validator';
-import RequestPagingDto from '../../../common/dto/paging.dto';
-import { RegistrationType } from '../entities/user.entity';
+import RequestPagingDto from '../../../../common/dto/paging.dto';
+import { RegistrationType } from '../../entities/user.entity';
 
-export class FilterGeneralMembersDto extends RequestPagingDto {
+export class FilterGeneralMembersReqDto extends RequestPagingDto {
   @ApiProperty({
     enum: RegistrationType,
     required: false,

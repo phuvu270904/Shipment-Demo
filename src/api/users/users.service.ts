@@ -3,8 +3,8 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { CreateUserReqDto } from './dto/request/create-user-req.dto';
+import { UpdateUserReqDto } from './dto/request/update-user-req.dto';
 import UserRepository from './repositories/user.repository';
 import { In } from 'typeorm';
 import { UserEntity } from './entities/user.entity';
@@ -14,7 +14,7 @@ import * as bcrypt from 'bcrypt';
 export class UsersService {
   constructor(private readonly userRepository: UserRepository) {}
 
-  async create(createUserDto: CreateUserDto): Promise<UserEntity> {
+  async create(createUserDto: CreateUserReqDto): Promise<UserEntity> {
     const user = this.userRepository.create(createUserDto);
     // Check if user already exists
     const existingUser = await this.userRepository.findByIdAddress(
@@ -60,7 +60,7 @@ export class UsersService {
     return user;
   }
 
-  async update(id: number, updateUserDto: UpdateUserDto): Promise<UserEntity> {
+  async update(id: number, updateUserDto: UpdateUserReqDto): Promise<UserEntity> {
     const user = await this.findOne(id);
 
     Object.assign(user, updateUserDto);

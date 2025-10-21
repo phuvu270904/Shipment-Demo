@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Field, InputType } from '@nestjs/graphql';
 import {
   IsEmail,
   IsEnum,
@@ -6,9 +7,11 @@ import {
   IsString,
   MinLength,
 } from 'class-validator';
-import { UserRole, RegistrationType } from '../entities/user.entity';
+import { UserRole, RegistrationType } from '../../entities/user.entity';
 
-export class UpdateUserDto {
+@InputType()
+export class UpdateUserReqDto {
+  @Field({ nullable: true })
   @ApiProperty({
     example: 'John Doe',
     description: 'User nickname',
@@ -18,6 +21,7 @@ export class UpdateUserDto {
   @IsString()
   nickname?: string;
 
+  @Field({ nullable: true })
   @ApiProperty({
     example: 'john.doe@example.com',
     description: 'User email address',
@@ -27,6 +31,7 @@ export class UpdateUserDto {
   @IsEmail()
   isAddress?: string;
 
+  @Field({ nullable: true })
   @ApiProperty({
     example: 'password123',
     description: 'User password',
@@ -37,6 +42,7 @@ export class UpdateUserDto {
   @MinLength(6)
   password?: string;
 
+  @Field(() => String, { nullable: true })
   @ApiProperty({
     enum: UserRole,
     description: 'User role in the system',
@@ -46,6 +52,7 @@ export class UpdateUserDto {
   @IsEnum(UserRole)
   role?: UserRole;
 
+  @Field(() => String, { nullable: true })
   @ApiProperty({
     enum: RegistrationType,
     description: 'User registration type',
@@ -55,6 +62,7 @@ export class UpdateUserDto {
   @IsEnum(RegistrationType)
   registration_type?: RegistrationType;
 
+  @Field({ nullable: true })
   @ApiProperty({
     example: '{"preferences": {"theme": "dark"}}',
     description: 'Additional user metadata as JSON string',
