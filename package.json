@@ -29,11 +29,14 @@
     "typeorm:revert-migrations:staging": "cross-env NODE_ENV=staging npm run typeorm -- migration:revert -d ./src/ormconfig.ts"
   },
   "dependencies": {
+    "@apollo/server": "^4.12.2",
     "@aws-sdk/client-s3": "^3.832.0",
+    "@nestjs/apollo": "^12.2.2",
     "@nestjs/cache-manager": "^2.1.1",
     "@nestjs/common": "^10.2.10",
     "@nestjs/config": "^3.1.1",
     "@nestjs/core": "^10.2.10",
+    "@nestjs/graphql": "^12.2.2",
     "@nestjs/jwt": "^10.2.0",
     "@nestjs/passport": "^10.0.2",
     "@nestjs/platform-express": "^10.2.10",
@@ -54,6 +57,7 @@
     "dotenv": "^16.5.0",
     "firebase": "^11.9.0",
     "firebase-admin": "^13.4.0",
+    "graphql": "^16.11.0",
     "helmet": "^7.1.0",
     "loadsh": "^0.0.4",
     "multer": "^2.0.1",
