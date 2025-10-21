@@ -5,19 +5,26 @@ import {
   Logger,
   HttpException,
 } from '@nestjs/common';
+import { GqlArgumentsHost } from '@nestjs/graphql';
 
 @Catch()
 export class CustomExceptionFilter implements ExceptionFilter {
   private logger = new Logger();
 
   catch(exception: Error, host: ArgumentsHost) {
-    const ctx = host.switchToHttp();
-    const response = ctx.getResponse();
-    const request = ctx.getRequest();
-
     const { name, message } = exception;
 
     this.logger.error(`[${exception.name}] : ${exception.message}`);
+
+    // Check if this is a GraphQL context
+    if (host.getType().toString() === 'graphql') {
+      throw exception;
+    }
+
+    // HTTP context handling
+    const ctx = host.switchToHttp();
+    const response = ctx.getResponse();
+    const request = ctx.getRequest();
 
     if (exception instanceof HttpException) {
       const status = exception.getStatus();
