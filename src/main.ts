@@ -5,7 +5,6 @@ import { ValidationPipe, VersioningType } from '@nestjs/common';
 
 // ** Custom Module Imports
 import { AppModule } from './app.module';
-import LoggerService from './util/logger/logger.service';
 
 // ** Security Imports
 import csurf from 'csurf';
@@ -34,9 +33,6 @@ async function bootstrap() {
     type: VersioningType.URI,
     defaultVersion: '1',
   });
-
-  // ** Logger
-  app.useLogger(app.get(LoggerService));
 
   // ** FIlter
   app.useGlobalFilters(new CustomExceptionFilter());

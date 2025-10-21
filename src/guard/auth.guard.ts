@@ -10,6 +10,7 @@ import { Request } from 'express';
 import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
 import { DataSource } from 'typeorm';
 import { UserEntity } from '../api/users/entities/user.entity';
+import { GqlExecutionContext } from '@nestjs/graphql';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -25,21 +26,24 @@ export class AuthGuard implements CanActivate {
       context.getClass(),
     ]);
 
-    const request = context.switchToHttp().getRequest();
+    const ctx = GqlExecutionContext.create(context);
+    const gqlContext = ctx.getContext();
+    const request: Request = gqlContext?.req ?? context.switchToHttp().getRequest();
+
+    if (!request) {
+      throw new UnauthorizedException('Cannot extract request from context');
+    }
+
     const token = this.extractTokenFromHeader(request);
 
-    // If it's a public endpoint, try to authenticate if token is provided
     if (isPublic) {
       if (token) {
         try {
           const payload = await this.jwtService.verifyAsync(token, {
             secret: process.env.JWT_ACCESS_TOKEN_SECRET,
           });
-          // Set user in request for optional authentication
           request['user'] = payload;
         } catch (error) {
-          // For public endpoints, we don't throw errors for invalid tokens
-          // We just don't set the user, so req.user remains undefined
           console.log(
             'Optional authentication failed for public endpoint:',
             error.message,
@@ -49,7 +53,6 @@ export class AuthGuard implements CanActivate {
       return true;
     }
 
-    // For protected endpoints, require valid authentication
     if (!token) {
       throw new UnauthorizedException({
         message: 'Authentication token missing',
@@ -62,18 +65,14 @@ export class AuthGuard implements CanActivate {
         secret: process.env.JWT_ACCESS_TOKEN_SECRET,
       });
 
-      // Check if the token was generated before a force login
       const userRepository = this.dataSource.getRepository(UserEntity);
-      const user = await userRepository.findOne({
-        where: { id: payload.id },
-      });
+      const user = await userRepository.findOne({ where: { id: payload.id } });
 
       if (
         user &&
         user.last_token_generated_at &&
         payload.platform === 'mobile'
       ) {
-        // Get the token's issued at time (iat) from the payload
         const tokenIssuedAt = payload.iat ? new Date(payload.iat * 1000) : null;
 
         if (tokenIssuedAt && tokenIssuedAt < user.last_token_generated_at) {
@@ -84,33 +83,28 @@ export class AuthGuard implements CanActivate {
         }
       }
 
-      // 💡 We're assigning the payload to the request object here
-      // so that we can access it in our route handlers
       request['user'] = payload;
     } catch (error) {
-      // If it's already our custom UnauthorizedException, re-throw it
-      if (error instanceof UnauthorizedException) {
-        throw error;
-      }
+      if (error instanceof UnauthorizedException) throw error;
 
-      // Check if the error is specifically a token expiration error
       if (error.name === 'TokenExpiredError') {
         throw new UnauthorizedException({
           message: 'Authentication token expired',
           code: 'TOKEN_EXPIRED',
         });
       }
-      // For other JWT or verification errors
+
       throw new UnauthorizedException({
         message: 'Invalid authentication token',
         code: 'INVALID_TOKEN',
       });
     }
+
     return true;
   }
 
   private extractTokenFromHeader(request: Request): string | undefined {
-    const [type, token] = request.headers.authorization?.split(' ') ?? [];
+    const [type, token] = request.headers?.authorization?.split(' ') ?? [];
     return type === 'Bearer' ? token : undefined;
   }
 }

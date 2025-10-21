@@ -7,38 +7,60 @@ import {
   NestInterceptor,
 } from '@nestjs/common';
 import { Observable, tap } from 'rxjs';
-
-// ** Type Imports
+import { GqlExecutionContext } from '@nestjs/graphql';
 import type { CommonResponseType } from '../type';
-
-// ** Utils Imports
-import { isEmpty } from 'loadsh';
+import { isEmpty } from 'lodash';
 
 @Injectable()
 export class LoggingInterceptor implements NestInterceptor {
-  private logger = new Logger();
-  intercept(
-    context: ExecutionContext,
-    next: CallHandler,
-  ): Observable<any> | Promise<Observable<any>> {
-    const request = context.switchToHttp().getRequest();
-    this.logger.log(`${request.method} : ${request.url}`);
+  private logger = new Logger('LoggingInterceptor');
 
-    if (!isEmpty(request.body)) {
-      this.logger.log(request.body);
+  intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
+    let request: any;
+    let method = '';
+    let path = '';
+
+    const httpCtx = context.switchToHttp().getRequest();
+    if (httpCtx) {
+      request = httpCtx;
+      method = request.method;
+      path = request.url;
+    } else {
+      const gqlCtx = GqlExecutionContext.create(context);
+      const gqlInfo = gqlCtx.getInfo();
+      const gqlReq = gqlCtx.getContext().req;
+
+      request = gqlReq;
+      method = 'GRAPHQL';
+      path = `${gqlInfo.parentType.name} → ${gqlInfo.fieldName}`;
     }
 
-    if (!isEmpty(request.query)) {
-      this.logger.log(request.query);
+    this.logger.log(`[${method}] ${path}`);
+
+    if (request && !isEmpty(request.body)) {
+      this.logger.log(`Body: ${JSON.stringify(request.body)}`);
     }
+
+    if (request && !isEmpty(request.query)) {
+      this.logger.log(`Query: ${JSON.stringify(request.query)}`);
+    }
+
+    const now = Date.now();
 
     return next.handle().pipe(
       tap({
         next: (response: CommonResponseType) => {
-          this.logger.log(`${response.statusCode} : ${response.message}`);
+          const elapsed = Date.now() - now;
+          this.logger.log(
+            `[${method}] ${path} → ${response.statusCode} (${elapsed}ms) : ${response.message}`,
+          );
         },
-        // eslint-disable-next-line @typescript-eslint/no-empty-function
-        error: (error: Error) => {},
+        error: (error: Error) => {
+          const elapsed = Date.now() - now;
+          this.logger.error(
+            `[${method}] ${path} → Error (${elapsed}ms): ${error.message}`,
+          );
+        },
       }),
     );
   }
