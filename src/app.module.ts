@@ -9,8 +9,12 @@ import LoggerService from './util/logger/logger.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TypeOrmExModule } from './repository/typeorm-ex.module';
 import ApiModule from './api/api.module';
+import { GraphQLModule } from '@nestjs/graphql';
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 
 import ormconfig from './ormconfig';
+import { join } from 'path';
+import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
 
 @Module({
   imports: [
@@ -32,6 +36,19 @@ import ormconfig from './ormconfig';
       },
       logging: true,
       logger: 'file',
+    }),
+    GraphQLModule.forRoot<ApolloDriverConfig>({
+      driver: ApolloDriver,
+      autoSchemaFile: join(process.cwd(), 'schema.graphql'),
+      context: ({ req, res }: { req: Request; res: Response }) => ({
+        req,
+        res,
+      }),
+      debug: false,
+      includeStacktraceInErrorResponses: false,
+      playground: false,
+      csrfPrevention: true,
+      plugins: [ApolloServerPluginLandingPageLocalDefault()],
     }),
     TypeOrmExModule,
     ApiModule,
