@@ -5,8 +5,8 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { RegisterDto } from './dto/register.dto';
-import { LoginDto } from './dto/login.dto';
+import { RegisterReqDto } from './dto/request/register-req.dto';
+import { LoginReqDto } from './dto/request/login-req.dto';
 import UserRepository from '../users/repositories/user.repository';
 import {
   UserEntity,
@@ -14,7 +14,7 @@ import {
   UserRole,
 } from '../users/entities/user.entity';
 import * as bcrypt from 'bcrypt';
-import { RefreshTokenDto } from './dto/refresh-token.dto';
+import { RefreshTokenReqDto } from './dto/request/refresh-token-req.dto';
 import { getAuth } from '../../config/firebase.config';
 import axios from 'axios';
 
@@ -25,26 +25,26 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async register(registerDto: RegisterDto) {
+  async register(RegisterReqDto: RegisterReqDto) {
     // Check if user already exists
     const existingUser = await this.userRepository.findByIdAddress(
-      registerDto.idAddress,
+      RegisterReqDto.idAddress,
     );
     if (existingUser) {
       throw new ConflictException('User with this id already exists');
     }
 
     // Hash the password
-    const hashedPassword = await bcrypt.hash(registerDto.password, 10);
+    const hashedPassword = await bcrypt.hash(RegisterReqDto.password, 10);
 
     // Create new user
     const newUser = this.userRepository.create({
-      nickname: registerDto.nickname,
-      idAddress: registerDto.idAddress,
+      nickname: RegisterReqDto.nickname,
+      idAddress: RegisterReqDto.idAddress,
       password: hashedPassword,
-      phone: registerDto.phone,
-      dob: registerDto.dob,
-      role: registerDto.role ? registerDto.role : UserRole.USER,
+      phone: RegisterReqDto.phone,
+      dob: RegisterReqDto.dob,
+      role: RegisterReqDto.role ? RegisterReqDto.role : UserRole.USER,
       registration_type: RegistrationType.GENERAL,
     });
 
@@ -59,16 +59,16 @@ export class AuthService {
     };
   }
 
-  async login(loginDto: LoginDto) {
+  async login(LoginReqDto: LoginReqDto) {
     // Find user by email
-    const user = await this.userRepository.findByIdAddress(loginDto.idAddress);
+    const user = await this.userRepository.findByIdAddress(LoginReqDto.idAddress);
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');
     }
 
     // Verify password
     const isPasswordValid = await bcrypt.compare(
-      loginDto.password,
+      LoginReqDto.password,
       user.password,
     );
     if (!isPasswordValid) {
@@ -120,10 +120,10 @@ export class AuthService {
     return userWithoutPassword;
   }
 
-  async refreshToken(refreshTokenDto: RefreshTokenDto) {
+  async refreshToken(RefreshTokenReqDto: RefreshTokenReqDto) {
     try {
       // Verify the refresh token
-      const payload = this.jwtService.verify(refreshTokenDto.refresh_token, {
+      const payload = this.jwtService.verify(RefreshTokenReqDto.refresh_token, {
         secret: process.env.JWT_REFRESH_TOKEN_SECRET,
       });
 

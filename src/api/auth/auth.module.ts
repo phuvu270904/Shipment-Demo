@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import { AuthController } from './auth.controller';
 import UsersModule from '../users/users.module';
 import { JwtModule } from '@nestjs/jwt';
 import { APP_GUARD } from '@nestjs/core';
@@ -11,6 +10,7 @@ import UserRepository from '../users/repositories/user.repository';
 import { AuthService } from './auth.service';
 import { ConfigModule } from '@nestjs/config';
 import { UserRolesGuard } from '../../guard/roles.guard';
+import { AuthResolver } from './auth.resolver';
 
 @Module({
   imports: [
@@ -28,7 +28,7 @@ import { UserRolesGuard } from '../../guard/roles.guard';
     TypeOrmExModule.forCustomRepository([UserRepository]),
     TypeOrmModule.forFeature([UserEntity]),
   ],
-  controllers: [AuthController],
+  controllers: [],
   providers: [
     {
       provide: APP_GUARD,
@@ -39,6 +39,7 @@ import { UserRolesGuard } from '../../guard/roles.guard';
       useClass: UserRolesGuard,
     },
     AuthService,
+    AuthResolver,
   ],
   exports: [JwtModule],
 })
