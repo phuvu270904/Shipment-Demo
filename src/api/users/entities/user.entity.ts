@@ -83,4 +83,7 @@ export class UserEntity {
 
   @Column({ nullable: true })
   fcm_token: string;
+
+  @Column({ type: 'timestamp', nullable: true })
+  last_token_generated_at: Date;
 }
